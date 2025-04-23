@@ -1,13 +1,18 @@
 import requests
 import pprint
 
+from json import (
+    loads,
+    JSONDecodeError
+)
+
 
 def test_post_v1_account():
     # 1 регистрация пользака
 
     url = 'http://5.63.153.31:5051/v1/account'
 
-    login = 'efremov_test2'
+    login = 'efremov_test6'
     password = '123456789'
     email = f'{login}@mail.ru'
 
@@ -18,8 +23,12 @@ def test_post_v1_account():
     }
 
     response = requests.post('http://5.63.153.31:5051/v1/account', json=json_data)
+
+    print('\n')
     print(response.status_code)
     print(response.text)
+
+    assert response.status_code == 201, f"Пользак не был создан {response.json()}"
 
     # 2 Получение писем из почтового ящика
 
@@ -28,14 +37,29 @@ def test_post_v1_account():
     }
 
     response = requests.get('http://5.63.153.31:5025/api/v2/messages', params=params, verify=False)
-    print(response.status_code)
-    print(response.text)
+
+    assert response.status_code == 200, "Письма не были получены"
 
     # 3 Получить активационный токен
+    token = None
+    try:
+        for item in response.json()['items']:
+            user_data = loads(item['Content']['Body'])
+            user_login = user_data['Login']
+
+            if user_login == login:
+                print('\n')
+                print(user_login)
+                token = user_data['ConfirmationLinkUrl'].split('/')[-1]
+                print(token)
+    except JSONDecodeError:
+        print("Response is not a json format")
+
+    assert token is not None, f"Токен для пользователя {login} не был получен"
 
     # 4 Активировать пользака
 
-    url = 'http://5.63.153.31:5051/v1/account/0461927a-1657-494a-acdf-24045a987072'
+    url = f'http://5.63.153.31:5051/v1/account/{token}'
 
     headers = {
         'Accept': 'application/json, text/plain, */*',
@@ -50,16 +74,18 @@ def test_post_v1_account():
         url,
         headers=headers
     )
+    print(response.status_code)
+    print(response.text)
+    # # Пытаемся парсить JSON только если ответ не пустой
+    # try:
+    #     response_json = response.json()
+    #     print("JSON Response:", response_json)
+    #     pprint.pprint(response_json)
+    # except requests.exceptions.JSONDecodeError:
+    #     print("Ошибка: Сервер вернул невалидный JSON или пустой ответ.")
+    assert response.status_code == 200, "Пользователь не был активирован"
 
-    # Пытаемся парсить JSON только если ответ не пустой
-    try:
-        response_json = response.json()
-        print("JSON Response:", response_json)
-        pprint.pprint(response_json)
-    except requests.exceptions.JSONDecodeError:
-        print("Ошибка: Сервер вернул невалидный JSON или пустой ответ.")
-
-    # Авторизация
+    # # Авторизация
 
     json_data = {
         'login': login,
@@ -70,3 +96,4 @@ def test_post_v1_account():
     response = requests.post('http://5.63.153.31:5051/v1/account/login', json=json_data)
     print(response.status_code)
     print(response.text)
+    assert response.status_code == 200, "Пользователь не смог авторизоваться"
