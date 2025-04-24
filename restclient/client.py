@@ -3,6 +3,7 @@ from json import JSONDecodeError
 from requests import session  # специальный объект через которые будут вып-ся все запросы
 import structlog
 import uuid
+import curlify
 
 
 class RestClient:
@@ -68,6 +69,8 @@ class RestClient:
 
         # из под сессии выполняем запрос
         rest_response = self.session.request(method=method, url=full_url, **kwargs)
+        curl = curlify.to_curl(rest_response.request)
+        print(curl)
 
         # логгируем ответ
         log.msg(
