@@ -11,11 +11,11 @@ from dm_api_mailhog.apis.mailhog_api import MailhogApi
 def test_post_v1_account():
     # 1 регистрация пользака
 
-    account_api = AccountApi(host='http://5.63.153.31:5051/v1/account')
-    login_api = LoginApi(host='http://5.63.153.31:5051/v1/account')
+    account_api = AccountApi(host='http://5.63.153.31:5051')
+    login_api = LoginApi(host='http://5.63.153.31:5051')
     mailhog_api = MailhogApi(host='http://5.63.153.31:5025')
 
-    login = 'efremov_test12'
+    login = 'efremov_test14'
     password = '123456789'
     email = f'{login}@mail.ru'
 
