@@ -15,7 +15,7 @@ def test_post_v1_account():
     login_api = LoginApi(host='http://5.63.153.31:5051/v1/account')
     mailhog_api = MailhogApi(host='http://5.63.153.31:5025')
 
-    login = 'efremov_test11'
+    login = 'efremov_test12'
     password = '123456789'
     email = f'{login}@mail.ru'
 
