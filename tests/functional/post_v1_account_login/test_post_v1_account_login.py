@@ -12,8 +12,8 @@ from dm_api_account.apis.login_api import LoginApi
 from dm_api_mailhog.apis.mailhog_api import MailhogApi
 
 
-def test_post_v1_account():
-# 1 регистрация пользака
+def test_post_v1_account_login():
+    # 1 регистрация пользака
     fake = Faker()
 
     account_api = AccountApi(host='http://5.63.153.31:5051')
@@ -38,7 +38,7 @@ def test_post_v1_account():
 
     assert response.status_code == 201, f"Пользак не был создан {response.json()}"
 
-# 2 Получение писем из почтового ящика
+    # 2 Получение писем из почтового ящика
 
     response = mailhog_api.get_api_v2_messages()
 
@@ -53,7 +53,7 @@ def test_post_v1_account():
 
     assert token is not None, f"Токен для пользователя {login} не был получен"
 
-# 4 Активировать пользака
+    # 4 Активировать пользака
 
     response = account_api.put_v1_account_token(token=token)
 
@@ -61,7 +61,7 @@ def test_post_v1_account():
     print(response.text)
     assert response.status_code == 200, "Пользователь не был активирован"
 
-# 5 Авторизация
+    # 5 Авторизация
 
     json_data = {
         'login': login,

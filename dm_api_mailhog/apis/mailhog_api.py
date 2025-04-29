@@ -17,7 +17,7 @@ class MailhogApi:
     ):
         """
         Get users emails
-        :return:
+        :return: response
         """
         params = {
             'limit': limit,
@@ -28,3 +28,5 @@ class MailhogApi:
             verify=False
         )
         return response
+
+

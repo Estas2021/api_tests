@@ -12,7 +12,7 @@ from dm_api_account.apis.login_api import LoginApi
 from dm_api_mailhog.apis.mailhog_api import MailhogApi
 
 
-def test_post_v1_account():
+def test_put_v1_account_token():
 # 1 регистрация пользака
     fake = Faker()
 
@@ -44,7 +44,7 @@ def test_post_v1_account():
 
     assert response.status_code == 200, "Письма не были получены"
 
-    # 3 Получить активационный токен
+# 3 Получить активационный токен
     token = get_activation_token_by_login(
         login,
         response,

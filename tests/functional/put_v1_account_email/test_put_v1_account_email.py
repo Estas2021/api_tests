@@ -12,7 +12,7 @@ from dm_api_account.apis.login_api import LoginApi
 from dm_api_mailhog.apis.mailhog_api import MailhogApi
 
 
-def test_post_v1_account():
+def test_put_v1_account_email():
 # 1 регистрация пользака
     fake = Faker()
 
@@ -44,7 +44,7 @@ def test_post_v1_account():
 
     assert response.status_code == 200, "Письма не были получены"
 
-    # 3 Получить активационный токен
+# 3 Получить активационный токен
     token = get_activation_token_by_login(
         login,
         response,
@@ -73,6 +73,48 @@ def test_post_v1_account():
     print(response.status_code)
     print(response.text)
     assert response.status_code == 200, "Пользователь не смог авторизоваться"
+
+# 6 Меняем емейл
+    json_data = {
+        'login': login,
+        'password': password,
+        'email': f'{login}@yandex.ru',
+        # 'email': f'{fake.email()}',
+    }
+
+    response = account_api.put_v1_account_email(json_data=json_data)
+
+# 7 Пытаемся войти, получаем 403
+    json_data = {
+        'login': login,
+        'password': password,
+        'rememberMe': True,
+    }
+
+    response = login_api.post_v1_account_login(json_data=json_data)
+
+    print(response.status_code)
+    print(response.text)
+    assert response.status_code == 403, "Пользователь таки авторизовался, но со старым мылом"
+
+    time.sleep(2)
+
+
+
+# 8 На почте находим токен по новому емейлу для подтверждения смены емейла
+
+    token = get_activation_token_by_login(
+        login,
+        response,
+        f'Подтверждение смены адреса электронной почты на DM.AM для {login}'
+    )
+
+    assert token is not None, f"Второй токен так и не был получен"
+
+# 9 Активируем этот токен
+
+# 10 Логинимся
+
 
 
 def decode_mime(
